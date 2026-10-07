@@ -5,7 +5,7 @@ body {
 img {
     background: #e5e7eb;
 }
-#list-property {
+list-property {
   max-width: 500px;
   margin: 40px auto;
   padding: 20px;
@@ -15,12 +15,12 @@ img {
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-#list-property h2 {
+list-property h2 {
   text-align: center;
   margin-bottom: 20px;
 }
 
-#listingForm input, #listingForm textarea {
+listingForm input, #listingForm textarea {
   width: 100%;
   padding: 10px;
   margin: 10px 0;
@@ -28,7 +28,7 @@ img {
   border-radius: 4px;
 }
 
-#listingForm button {
+listingForm button {
   width: 100%;
   padding: 10px;
   background: #4CAF50;
@@ -37,7 +37,6 @@ img {
   border-radius: 4px;
   cursor: pointer;
 }
-
-#listingForm button:hover {
+listingForm button:hover {
   background: #45a049;
 }
