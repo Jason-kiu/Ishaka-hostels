@@ -5,3 +5,39 @@ body {
 img {
     background: #e5e7eb;
 }
+#list-property {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#list-property h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#listingForm input, #listingForm textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#listingForm button {
+  width: 100%;
+  padding: 10px;
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#listingForm button:hover {
+  background: #45a049;
+}
