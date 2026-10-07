@@ -19,6 +19,19 @@
             <textarea id="details" placeholder="Facilities: water inside, tiled, etc." class="w-full border p-3 rounded"></textarea>
             <button class="w-full bg-green-700 text-white p-3 rounded-xl font-bold">Send via WhatsApp</button>
         </form>
+
+<section id="list-property">
+  <h2>List Your Property</h2>
+  <form id="listingForm">
+    <input type="text" id="hostelName" placeholder="Hostel Name" required>
+    <input type="text" id="location" placeholder="Location" required>
+    <input type="number" id="price" placeholder="Price (UGX)" required>
+    <textarea id="amenities" placeholder="Amenities (e.g. WiFi, water, etc.)"></textarea>
+    <input type="text" id="contact" placeholder="Contact (phone/WhatsApp)" required>
+    <input type="file" id="images" multiple>
+    <button type="submit">Submit Listing</button>
+  </form>
+</section>
     </div>
     <script>
 function sendToWhatsApp(e){
@@ -26,6 +39,25 @@ function sendToWhatsApp(e){
   let msg = `NEW HOSTEL LISTING:%0AName: ${document.getElementById('hname').value}%0APhone: ${document.getElementById('phone').value}%0ALocation: ${document.getElementById('location').value}%0APrice: ${document.getElementById('price').value}%0ADetails: ${document.getElementById('details').value}`;
   window.open(`https://wa.me/256767037951?text=${msg}`, '_blank');
 }
+
+document.getElementById('listingForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const data = {
+    hostelName: document.getElementById('hostelName').value,
+    location: document.getElementById('location').value,
+    price: document.getElementById('price').value,
+    amenities: document.getElementById('amenities').value,
+    contact: document.getElementById('contact').value,
+    images: document.getElementById('images').files,
+    status: 'Pending'
+  };
+  fetch('YOUR_GOOGLE_SCRIPT_URL', { // replace with your Apps Script URL
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+  .then(() => alert('Listing submitted for verification!'))
+  .catch((err) => alert('Error: ' + err));
+});
     </script>
 </body>
 </html>
