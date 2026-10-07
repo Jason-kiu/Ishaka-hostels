@@ -1,63 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List Your Hostel FREE</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Landlords - Ishaka Hostels</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 p-6">
-    <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
-        <h1 class="text-2xl font-bold text-green-700">List Your Hostel FREE</h1>
-        <p class="text-sm text-gray-600 mt-2">We fill empty rooms in 7 days. You only pay 50k when student moves in. No upfront fee.</p>
-
-        <form class="mt-6 space-y-3" onsubmit="sendToWhatsApp(event)">
-            <input id="hname" required placeholder="Hostel Name e.g. Grace Hostel" class="w-full border p-3 rounded">
-            <input id="phone" required placeholder="Your Phone Number" class="w-full border p-3 rounded">
-            <input id="location" required placeholder="Location e.g. KIU Road, Kanyamiramu" class="w-full border p-3 rounded">
-            <input id="price" required placeholder="Price per Semester e.g. 450k" class="w-full border p-3 rounded">
-            <textarea id="details" placeholder="Facilities: water inside, tiled, etc." class="w-full border p-3 rounded"></textarea>
-            <button class="w-full bg-green-700 text-white p-3 rounded-xl font-bold">Send via WhatsApp</button>
-        </form>
-
-<section id="list-property">
-  <h2>List Your Property</h2>
-  <form id="listingForm">
-    <input type="text" id="hostelName" placeholder="Hostel Name" required>
-    <input type="text" id="location" placeholder="Location" required>
-    <input type="number" id="price" placeholder="Price (UGX)" required>
-    <textarea id="amenities" placeholder="Amenities (e.g. WiFi, water, etc.)"></textarea>
-    <input type="text" id="contact" placeholder="Contact (phone/WhatsApp)" required>
-    <input type="file" id="images" multiple>
-    <button type="submit">Submit Listing</button>
-  </form>
-</section>
-    </div>
-    <script>
-function sendToWhatsApp(e){
-  e.preventDefault();
-  let msg = `NEW HOSTEL LISTING:%0AName: ${document.getElementById('hname').value}%0APhone: ${document.getElementById('phone').value}%0ALocation: ${document.getElementById('location').value}%0APrice: ${document.getElementById('price').value}%0ADetails: ${document.getElementById('details').value}`;
-  window.open(`https://wa.me/256767037951?text=${msg}`, '_blank');
-}
-
-document.getElementById('listingForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const data = {
-    hostelName: document.getElementById('hostelName').value,
-    location: document.getElementById('location').value,
-    price: document.getElementById('price').value,
-    amenities: document.getElementById('amenities').value,
-    contact: document.getElementById('contact').value,
-    images: document.getElementById('images').files,
-    status: 'Pending'
-  };
-  fetch('YOUR_GOOGLE_SCRIPT_URL', { // replace with your Apps Script URL
-    method: 'POST',
-    body: JSON.stringify(data),
-  })
-  .then(() => alert('Listing submitted for verification!'))
-  .catch((err) => alert('Error: ' + err));
-});
-    </script>
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="hostels.html">Hostels</a></li>
+        <li><a href="for-landlords.html">List Your Property</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section id="list-property">
+      <h2>List Your Property</h2>
+      <form id="listingForm">
+        <input type="text" id="hostelName" placeholder="Hostel Name" required>
+        <input type="text" id="location" placeholder="Location" required>
+        <input type="number" id="price" placeholder="Price (UGX)" required>
+        <textarea id="amenities" placeholder="Amenities (e.g. WiFi, water, etc.)"></textarea>
+        <input type="text" id="contact" placeholder="Contact (phone/WhatsApp)" required>
+        <input type="file" id="images" multiple>
+        <button type="submit">Submit Listing</button>
+      </form>
+    </section>
+  </main>
+  <script src="script.js"></script>
 </body>
 </html>
