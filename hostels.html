@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Hostels - Ishaka</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow p-4"><a href="index.html" class="font-bold text-green-700">← Back Home</a></nav>
+    <div class="p-4 max-w-6xl mx-auto grid md:grid-cols-4 gap-6">
+        <div class="bg-white p-4 rounded-xl h-fit">
+            <h3 class="font-bold mb-3">Filter</h3>
+            <label class="text-sm">Budget</label>
+            <select class="w-full border p-2 rounded mb-3"><option>All</option><option>300-400k</option><option>400-500k</option></select>
+            <label class="text-sm">Distance</label>
+            <select class="w-full border p-2 rounded mb-3"><option>All</option><option><5 min walk</option><option>5-10 min</option></select>
+            <button class="w-full bg-green-700 text-white p-2 rounded">Apply</button>
+        </div>
+        <div class="md:col-span-3 grid md:grid-cols-2 gap-4">
+            <!-- DUPLICATE THIS CARD AND EDIT - You will have 20 of these -->
+            <div class="bg-white rounded-xl shadow overflow-hidden">
+                <img src="images/hostel1.jpg" onerror="this.src='https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400'" class="h-48 w-full object-cover">
+                <div class="p-4">
+                    <h4 class="font-bold">Sample Hostel - Edit Me</h4>
+                    <p class="text-xs text-gray-500">KIU Road | Single | Water inside</p>
+                    <p class="font-bold text-green-700 mt-1">400k/sem</p>
+                    <div class="flex gap-2 mt-3">
+                        <a href="hostel-details.html" class="flex-1 border text-center py-2 rounded text-sm">Details</a>
+                        <a href="https://wa.me/256767037951" class="flex-1 bg-green-600 text-white text-center py-2 rounded text-sm">WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Add more cards -->
+        </div>
+    </div>
+</body>
+</html>
