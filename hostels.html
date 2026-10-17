@@ -52,7 +52,7 @@ function card(l) {
       <p class="text-xs text-gray-500 mt-1">${l.amenities.slice(0,3).map(esc).join(', ')}</p>
       <div class="mt-auto pt-3 flex gap-2">
         <a href="hostel-details.html?id=${esc(l.id)}" class="flex-1 border text-center py-2 rounded text-sm">Details</a>
-        <a href="${waLink(l)}" target="_blank" rel="noopener" class="flex-1 bg-green-600 text-white text-center py-2 rounded text-sm">WhatsApp</a>
+        <button data-lead="${esc(l.id)}" class="flex-1 bg-green-600 text-white text-center py-2 rounded text-sm">WhatsApp</button>
       </div>
     </div></article>`;
 }

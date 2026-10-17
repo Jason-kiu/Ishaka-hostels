@@ -37,8 +37,8 @@ if (!l) {
     <p class="mt-2 flex flex-wrap gap-2">${l.amenities.map(a => `<span class="text-sm bg-green-50 text-green-800 px-3 py-1 rounded-full">${esc(a)}</span>`).join('')}</p>
     ${l.reviews.length ? `<div class="mt-6 p-4 bg-green-50 rounded-xl"><h2 class="font-bold">Student reviews (${l.reviews.length})</h2>${l.reviews.map(r => `<p class="text-sm mt-2">${'★'.repeat(r.stars)} "${esc(r.text)}" - ${esc(r.name)}</p>`).join('')}</div>` : ''}
     <div class="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-2xl flex gap-2 md:static md:shadow-none md:mt-6 md:p-0">
-      <a href="tel:+${esc(l.phone)}" class="flex-1 border-2 border-green-700 text-green-700 py-3 rounded-xl text-center font-bold">Call</a>
-      <a href="${waLink(l)}" target="_blank" rel="noopener" class="flex-[2] bg-green-700 text-white py-3 rounded-xl text-center font-bold">Message on WhatsApp</a>
+      <button data-lead="${esc(l.id)}" data-act="call" class="flex-1 border-2 border-green-700 text-green-700 py-3 rounded-xl text-center font-bold">Call</button>
+      <button data-lead="${esc(l.id)}" class="flex-[2] bg-green-700 text-white py-3 rounded-xl text-center font-bold">Message on WhatsApp</button>
     </div>`;
 }
 })();

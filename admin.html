@@ -12,7 +12,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TAB = 'pending', ROWS = [];
 function tabs() {
-  $('tabs').innerHTML = [['pending','Pending'],['approved','Live'],['rejected','Rejected']].map(([v, n]) =>
+  $('tabs').innerHTML = [['pending','Pending'],['approved','Live'],['rejected','Rejected'],['leads','Leads and income']].map(([v, n]) =>
     `<button data-t="${v}" class="px-4 py-1.5 rounded-full border ${v === TAB ? 'bg-green-700 text-white border-green-700' : 'bg-white'}">${n}</button>`).join('');
 }
 (async () => {
@@ -23,6 +23,7 @@ function tabs() {
   tabs(); load();
 })();
 async function load() {
+  if (TAB === 'leads') return loadLeads();
   const { data, error } = await db.from('listings').select('*').eq('status', TAB).order('created_at', { ascending: false });
   if (error) { $('list').innerHTML = '<p class="text-red-600 text-sm">' + esc(error.message) + '</p>'; return; }
   ROWS = data;
@@ -46,11 +47,46 @@ async function load() {
 $('tabs').onclick = e => { if (e.target.dataset.t) { TAB = e.target.dataset.t; tabs(); load(); } };
 $('list').onclick = async e => {
   const { a, id } = e.target.dataset; if (!a) return;
+  if (TAB === 'leads') return leadAction(a, id);
   const l = ROWS.find(x => x.id === id); let q;
   if (a === 'approve') q = db.from('listings').update({ status: 'approved', reject_reason: null }).eq('id', id);
   else if (a === 'reject') { const r = prompt('Reason for rejecting (the landlord will see this):'); if (r === null) return; q = db.from('listings').update({ status: 'rejected', reject_reason: r.trim() || null }).eq('id', id); }
   else if (a === 'feature') q = db.from('listings').update({ featured: !l.featured }).eq('id', id);
   else if (a === 'delete') { if (!confirm('Delete permanently?')) return; q = db.from('listings').delete().eq('id', id); }
   const { error } = await q; if (error) alert(error.message); else load();
+};
+const wa = p => { p = String(p).replace(/\D/g, ''); return p.startsWith('0') ? '256' + p.slice(1) : p; };
+const ug = n => 'UGX ' + (n / 1000) + 'k';
+async function loadLeads() {
+  const { data, error } = await db.from('leads').select('*').order('created_at', { ascending: false });
+  if (error) { $('list').innerHTML = '<p class="text-red-600 text-sm">' + esc(error.message) + '</p>'; return; }
+  ROWS = data;
+  const sum = f => data.filter(f).reduce((s, x) => s + x.commission_due, 0);
+  const stat = (n, v) => `<div class="bg-white rounded-xl shadow p-3"><p class="text-xs text-gray-500">${n}</p><p class="font-bold">${v}</p></div>`;
+  $('list').innerHTML = `<div class="grid grid-cols-3 gap-2 text-center text-sm">${stat('Leads', data.length)}${stat('Due, unpaid', ug(sum(x => x.status === 'moved_in' && !x.paid)))}${stat('Collected', ug(sum(x => x.paid)))}</div>` +
+    data.map(x => `<article class="bg-white rounded-xl shadow p-3 text-sm">
+      <div class="flex justify-between gap-2"><span class="font-mono font-bold">${esc(x.code)}</span>
+        <select data-sid="${x.id}" class="border rounded p-1 text-xs bg-white">${['inquiry','viewing','moved_in','cancelled'].map(v => `<option value="${v}" ${v === x.status ? 'selected' : ''}>${v.replace('_', ' ')}</option>`).join('')}</select></div>
+      <p class="mt-1">${esc(x.student_name)}${x.course ? ', ' + esc(x.course) : ''}. <a class="text-green-700" href="https://wa.me/${wa(x.student_phone)}" target="_blank" rel="noopener">${esc(x.student_phone)}</a></p>
+      <p class="text-gray-500">${esc(x.listing_title)}, ${new Date(x.created_at).toLocaleDateString('en-GB')}${x.notes ? '. Note: ' + esc(x.notes) : ''}</p>
+      <div class="mt-2 flex flex-wrap gap-2">
+        <button data-a="due" data-id="${x.id}" class="border px-3 py-1 rounded">Due: ${ug(x.commission_due)}</button>
+        <button data-a="pay" data-id="${x.id}" class="${x.paid ? 'bg-green-700 text-white' : 'border'} px-3 py-1 rounded">${x.paid ? 'Paid' : 'Mark paid'}</button>
+        <button data-a="note" data-id="${x.id}" class="border px-3 py-1 rounded">Note</button>
+        <button data-a="ldel" data-id="${x.id}" class="text-red-600 px-2">Delete</button>
+      </div></article>`).join('');
+}
+async function leadAction(a, id) {
+  const r = ROWS.find(x => x.id === id); let q;
+  if (a === 'pay') q = db.from('leads').update({ paid: !r.paid, paid_at: r.paid ? null : new Date().toISOString() }).eq('id', id);
+  else if (a === 'due') { const v = prompt('Commission due (UGX):', r.commission_due); if (v === null) return; q = db.from('leads').update({ commission_due: parseInt(v, 10) || 0 }).eq('id', id); }
+  else if (a === 'note') { const v = prompt('Note:', r.notes || ''); if (v === null) return; q = db.from('leads').update({ notes: v.trim() || null }).eq('id', id); }
+  else if (a === 'ldel') { if (!confirm('Delete this lead permanently?')) return; q = db.from('leads').delete().eq('id', id); }
+  const { error } = await q; if (error) alert(error.message); else load();
+}
+$('list').onchange = async e => {
+  const id = e.target.dataset.sid; if (!id) return;
+  const upd = { status: e.target.value }; if (upd.status === 'moved_in') upd.moved_in_at = new Date().toISOString();
+  const { error } = await db.from('leads').update(upd).eq('id', id); if (error) alert(error.message); load();
 };
 </script></body></html>

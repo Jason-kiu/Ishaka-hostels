@@ -12,6 +12,13 @@
   </div>
   <p class="text-sm text-gray-500 mb-4">New listings and edits are checked before they go live.</p>
   <div id="list" class="space-y-3"><p class="text-sm text-gray-500">Loading...</p></div>
+  <section class="mt-8">
+    <h2 class="text-xl font-bold">Student leads</h2>
+    <p class="text-sm text-gray-500 mt-1 mb-3">Students who contacted you through the site. When a student moves in, enter their reference code. A commission is due to Ishaka Hostels for each move-in.</p>
+    <form id="mi" class="flex gap-2"><input id="code" required placeholder="Reference code e.g. 7F3A9C" class="flex-1 border p-3 rounded uppercase"><button class="bg-green-700 text-white px-4 rounded">Mark moved in</button></form>
+    <p id="mimsg" class="text-sm mt-2" role="status"></p>
+    <div id="leads" class="space-y-2 mt-3"></div>
+  </section>
 </main>
 <script src="config.js"></script>
 <script>
@@ -25,7 +32,7 @@ let UID;
   UID = session.user.id;
   const { data: p } = await db.from('profiles').select('role').eq('id', UID).single();
   if (p && p.role === 'admin') $('adm').hidden = false;
-  load();
+  load(); loadLeads();
 })();
 async function load() {
   const { data, error } = await db.from('listings').select('*').eq('owner_id', UID).order('created_at', { ascending: false });
@@ -52,5 +59,27 @@ $('list').onclick = async e => {
   if (!id || !confirm('Delete this listing?')) return;
   const { error } = await db.from('listings').delete().eq('id', id);
   if (error) alert(error.message); else load();
+};
+const wa = p => { p = String(p).replace(/\D/g, ''); return p.startsWith('0') ? '256' + p.slice(1) : p; };
+const LB = { inquiry:['Inquiry','bg-gray-100 text-gray-700'], viewing:['Viewing','bg-blue-100 text-blue-800'], moved_in:['Moved in','bg-green-100 text-green-800'], cancelled:['Cancelled','bg-red-100 text-red-800'] };
+async function loadLeads() {
+  const { data, error } = await db.from('leads').select('*').order('created_at', { ascending: false });
+  if (error) { $('leads').innerHTML = '<p class="text-red-600 text-sm">' + esc(error.message) + '</p>'; return; }
+  $('leads').innerHTML = data.length ? data.map(x => {
+    const [t, c] = LB[x.status];
+    return `<div class="bg-white rounded-xl shadow p-3 text-sm">
+      <div class="flex justify-between gap-2"><span class="font-mono font-bold">${esc(x.code)}</span><span class="text-xs px-2 py-0.5 rounded ${c}">${t}</span></div>
+      <p class="mt-1">${esc(x.student_name)}${x.course ? ', ' + esc(x.course) : ''}. <a class="text-green-700" href="https://wa.me/${wa(x.student_phone)}" target="_blank" rel="noopener">${esc(x.student_phone)}</a></p>
+      <p class="text-gray-500">${esc(x.listing_title)}, ${new Date(x.created_at).toLocaleDateString('en-GB')}</p>
+      ${x.status === 'moved_in' ? `<p class="mt-1 text-gray-700">Commission: UGX ${x.commission_due / 1000}k, ${x.paid ? 'paid' : 'not yet paid'}</p>` : ''}
+    </div>`;
+  }).join('') : '<p class="text-sm text-gray-500">No student leads yet.</p>';
+}
+$('mi').onsubmit = async e => {
+  e.preventDefault();
+  const { error } = await db.rpc('mark_moved_in', { p_code: $('code').value });
+  $('mimsg').textContent = error ? error.message : 'Marked as moved in.';
+  $('mimsg').className = 'text-sm mt-2 ' + (error ? 'text-red-600' : 'text-green-700');
+  if (!error) { $('code').value = ''; loadLeads(); }
 };
 </script></body></html>
