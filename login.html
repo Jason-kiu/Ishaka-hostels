@@ -62,7 +62,7 @@ $('form').onsubmit = async e => {
   if (SUPABASE_ANON_KEY.includes('PASTE')) return msg('The Supabase key is missing in config.js.', true);
   const email = $('email').value.trim(), password = $('pw').value;
   msg('Please wait...');
-  const res = mode === 'login' ? await db.auth.signInWithPassword({ email, password }) : await db.auth.signUp({ email, password });
+  const res = mode === 'login' ? await db.auth.signInWithPassword({ email, password }) : await db.auth.signUp({ email, password, options: { emailRedirectTo: location.origin + '/login.html' } });
   if (res.error) return msg(res.error.message, true);
   if (mode === 'signup' && !res.data.session) return msg('Account created. Check your email for a confirmation link, then log in.');
   msg(''); show();
