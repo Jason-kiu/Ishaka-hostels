@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script><title>My listings | Ishaka Hostels</title></head>
+<body class="bg-gray-50 text-gray-900">
+<nav class="bg-white shadow p-4 flex justify-between items-center">
+  <a href="index.html" class="font-bold text-green-700">IshakaHostels</a>
+  <span class="text-sm"><a id="adm" hidden href="admin.html" class="text-green-700 font-semibold mr-4">Admin</a><a href="login.html" class="text-gray-500">Account</a></span>
+</nav>
+<main class="max-w-3xl mx-auto p-4">
+  <div class="flex justify-between items-center my-4">
+    <h1 class="text-xl font-bold">My listings</h1>
+    <a href="post.html" class="bg-green-700 text-white px-4 py-2 rounded-full text-sm">Post a listing</a>
+  </div>
+  <p class="text-sm text-gray-500 mb-4">New listings and edits are checked before they go live.</p>
+  <div id="list" class="space-y-3"><p class="text-sm text-gray-500">Loading...</p></div>
+</main>
+<script src="config.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const BADGE = { pending:['Waiting for approval','bg-yellow-100 text-yellow-800'], approved:['Live','bg-green-100 text-green-800'], rejected:['Rejected','bg-red-100 text-red-800'] };
+let UID;
+(async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) { location.href = 'login.html'; return; }
+  UID = session.user.id;
+  const { data: p } = await db.from('profiles').select('role').eq('id', UID).single();
+  if (p && p.role === 'admin') $('adm').hidden = false;
+  load();
+})();
+async function load() {
+  const { data, error } = await db.from('listings').select('*').eq('owner_id', UID).order('created_at', { ascending: false });
+  if (error) { $('list').innerHTML = '<p class="text-red-600 text-sm">' + esc(error.message) + '</p>'; return; }
+  $('list').innerHTML = data.length ? data.map(l => {
+    const [t, c] = BADGE[l.status];
+    return `<article class="bg-white rounded-xl shadow p-3 flex gap-3">
+      <img src="${esc(l.image_url)}" alt="" class="w-24 h-24 object-cover rounded-lg shrink-0">
+      <div class="flex-1 min-w-0">
+        <h2 class="font-semibold truncate">${esc(l.title)}</h2>
+        <p class="text-sm text-gray-500">UGX ${l.price/1000}k per ${esc(l.period)}, ${esc(l.area)}</p>
+        <span class="inline-block text-xs px-2 py-0.5 rounded mt-1 ${c}">${t}</span>
+        ${l.status === 'rejected' && l.reject_reason ? '<p class="text-xs text-red-600 mt-1">Reason: ' + esc(l.reject_reason) + '</p>' : ''}
+        <div class="mt-2 text-sm flex gap-4">
+          ${l.status === 'approved' ? '<a class="text-green-700" href="hostel-details.html?id=' + l.id + '">View</a>' : ''}
+          <a class="text-green-700" href="post.html?id=${l.id}">Edit</a>
+          <button data-del="${l.id}" class="text-red-600">Delete</button>
+        </div>
+      </div></article>`;
+  }).join('') : '<div class="bg-white rounded-xl p-8 text-center"><p class="font-semibold">No listings yet.</p><a href="post.html" class="inline-block mt-3 text-green-700 font-semibold">Post your first listing</a></div>';
+}
+$('list').onclick = async e => {
+  const id = e.target.dataset.del;
+  if (!id || !confirm('Delete this listing?')) return;
+  const { error } = await db.from('listings').delete().eq('id', id);
+  if (error) alert(error.message); else load();
+};
+</script></body></html>
