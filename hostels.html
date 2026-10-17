@@ -1,38 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Hostels - Ishaka</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hostels and rentals in Ishaka | Ishaka Hostels</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50">
-    <nav class="bg-white shadow p-4"><a href="index.html" class="font-bold text-green-700">← Back Home</a></nav>
-    <div class="p-4 max-w-6xl mx-auto grid md:grid-cols-4 gap-6">
-        <div class="bg-white p-4 rounded-xl h-fit">
-            <h3 class="font-bold mb-3">Filter</h3>
-            <label class="text-sm">Budget</label>
-            <select class="w-full border p-2 rounded mb-3"><option>All</option><option>300-400k</option><option>400-500k</option></select>
-            <label class="text-sm">Distance</label>
-            <select class="w-full border p-2 rounded mb-3"><option>All</option><option><5 min walk</option><option>5-10 min</option></select>
-            <button class="w-full bg-green-700 text-white p-2 rounded">Apply</button>
-        </div>
-        <div class="md:col-span-3 grid md:grid-cols-2 gap-4">
-            <!-- DUPLICATE THIS CARD AND EDIT - You will have 20 of these -->
-            <div class="bg-white rounded-xl shadow overflow-hidden">
-                <img src="images/hostel1.jpg" onerror="this.src='https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400'" class="h-48 w-full object-cover">
-                <div class="p-4">
-                    <h4 class="font-bold">Sample Hostel - Edit Me</h4>
-                    <p class="text-xs text-gray-500">KIU Road | Single | Water inside</p>
-                    <p class="font-bold text-green-700 mt-1">400k/sem</p>
-                    <div class="flex gap-2 mt-3">
-                        <a href="hostel-details.html" class="flex-1 border text-center py-2 rounded text-sm">Details</a>
-                        <a href="https://wa.me/256767037951" class="flex-1 bg-green-600 text-white text-center py-2 rounded text-sm">WhatsApp</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Add more cards -->
-        </div>
-    </div>
+<body class="bg-gray-50 text-gray-900">
+<nav class="bg-white shadow sticky top-0 z-10">
+  <div class="max-w-6xl mx-auto p-3 flex items-center gap-3">
+    <a href="index.html" class="font-bold text-green-700 shrink-0">IshakaHostels</a>
+    <input id="q" type="search" placeholder="Search by name, area or facility" class="flex-1 border rounded-full px-4 py-2 text-sm">
+    <a href="for-landlords.html" class="hidden sm:block bg-green-700 text-white px-4 py-2 rounded-full text-sm shrink-0">Post a listing</a>
+  </div>
+  <div id="types" class="max-w-6xl mx-auto px-3 pb-3 flex gap-2 overflow-x-auto text-sm"></div>
+</nav>
+<main class="max-w-6xl mx-auto p-3">
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm">
+    <select id="area" class="border rounded p-2 bg-white"></select>
+    <select id="budget" class="border rounded p-2 bg-white"><option value="0">Any budget</option><option value="100000">Up to 100k</option><option value="300000">Up to 300k</option><option value="400000">Up to 400k</option><option value="500000">Up to 500k</option></select>
+    <select id="walk" class="border rounded p-2 bg-white"><option value="0">Any distance to KIU</option><option value="5">Within 5 min walk</option><option value="10">Within 10 min walk</option><option value="20">Within 20 min walk</option></select>
+    <select id="period" class="border rounded p-2 bg-white"><option value="">Pay per semester or month</option><option value="semester">Per semester</option><option value="month">Per month</option></select>
+    <select id="sort" class="border rounded p-2 bg-white col-span-2 md:col-span-1"><option value="new">Newest first</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="near">Nearest to KIU</option></select>
+  </div>
+  <p id="count" class="text-sm text-gray-500 my-3"></p>
+  <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+</main>
+<script src="listings.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const p = new URLSearchParams(location.search);
+const live = LISTINGS.filter(l => l.status === 'approved');
+$('area').innerHTML = '<option value="">All areas</option>' + [...new Set(live.map(l => l.area))].sort().map(a => `<option>${esc(a)}</option>`).join('');
+['q','area','budget','walk','period','sort'].forEach(k => { if (p.get(k)) $(k).value = p.get(k); });
+const TYPES = [['','All'],['hostel','Hostels'],['room','Rooms'],['apartment','Apartments']];
+let type = p.get('type') || '';
+function chips() {
+  $('types').innerHTML = TYPES.map(([v,n]) => `<button data-t="${v}" class="px-4 py-1.5 rounded-full border whitespace-nowrap ${v===type?'bg-green-700 text-white border-green-700':'bg-white'}">${n}</button>`).join('');
+}
+$('types').onclick = e => { const b = e.target.closest('button'); if (b) { type = b.dataset.t; chips(); render(); } };
+function card(l) {
+  return `<article class="bg-white rounded-xl shadow overflow-hidden flex flex-col">
+    <a href="hostel-details.html?id=${esc(l.id)}"><img src="${esc(l.image)}" alt="${esc(l.title)}" loading="lazy" class="h-44 w-full object-cover"></a>
+    <div class="p-4 flex-1 flex flex-col">
+      <p class="font-bold text-green-700">${money(l)}</p>
+      <h2 class="font-semibold mt-1">${esc(l.title)} ${l.sample ? '<span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Sample</span>' : ''}</h2>
+      <p class="text-xs text-gray-500">${esc(l.area)}, ${l.walkMins} min walk to KIU. ${esc(l.roomKind)}</p>
+      <p class="text-xs text-gray-500 mt-1">${l.amenities.slice(0,3).map(esc).join(', ')}</p>
+      <div class="mt-auto pt-3 flex gap-2">
+        <a href="hostel-details.html?id=${esc(l.id)}" class="flex-1 border text-center py-2 rounded text-sm">Details</a>
+        <a href="${waLink(l)}" target="_blank" rel="noopener" class="flex-1 bg-green-600 text-white text-center py-2 rounded text-sm">WhatsApp</a>
+      </div>
+    </div></article>`;
+}
+function render() {
+  const q = $('q').value.trim().toLowerCase(), area = $('area').value, budget = +$('budget').value, walk = +$('walk').value, period = $('period').value, sort = $('sort').value;
+  const r = live.filter(l =>
+    (!type || l.type === type) && (!area || l.area === area) && (!budget || l.price <= budget) &&
+    (!walk || l.walkMins <= walk) && (!period || l.period === period) &&
+    (!q || [l.title, l.area, l.roomKind, ...l.amenities].join(' ').toLowerCase().includes(q)));
+  r.sort((a, b) => sort === 'low' ? a.price - b.price : sort === 'high' ? b.price - a.price : sort === 'near' ? a.walkMins - b.walkMins : b.createdAt.localeCompare(a.createdAt));
+  $('count').textContent = `${r.length} ${r.length === 1 ? 'listing' : 'listings'} in Ishaka`;
+  $('grid').innerHTML = r.length ? r.map(card).join('') :
+    '<div class="col-span-full bg-white rounded-xl p-8 text-center"><p class="font-semibold">No listings match these filters.</p><p class="text-sm text-gray-500 mt-1">Try a higher budget or a wider distance.</p><a href="hostels.html" class="inline-block mt-3 text-green-700 font-semibold">Clear filters</a></div>';
+}
+['q','area','budget','walk','period','sort'].forEach(k => $(k).addEventListener('input', render));
+chips(); render();
+</script>
 </body>
 </html>
