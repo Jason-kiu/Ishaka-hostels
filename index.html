@@ -16,31 +16,22 @@
   </div>
 </nav>
 
-<header class="bg-white border-b">
-  <div class="max-w-3xl mx-auto px-4 py-8 md:py-12">
-    <h1 class="text-3xl md:text-4xl font-bold">Find a place to stay in Ishaka</h1>
-    <p class="mt-2 text-gray-600">Hostels, rooms and apartments near KIU. Contact the landlord directly.</p>
-    <form action="hostels.html" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-2">
-      <input name="q" type="search" placeholder="Search name or facility" class="col-span-2 md:col-span-4 border rounded-lg p-3">
-      <select name="area" id="area" class="border rounded-lg p-3 bg-white"></select>
-      <select name="budget" class="border rounded-lg p-3 bg-white"><option value="0">Any budget</option><option value="100000">Up to 100k</option><option value="300000">Up to 300k</option><option value="400000">Up to 400k</option><option value="500000">Up to 500k</option></select>
-      <select name="walk" class="border rounded-lg p-3 bg-white"><option value="0">Any distance to KIU</option><option value="5">Within 5 min walk</option><option value="10">Within 10 min walk</option></select>
-      <button class="bg-green-700 text-white rounded-lg p-3 font-bold">Search</button>
-    </form>
-  </div>
-</header>
+    <!-- HERO -->
+    <section class="bg-white p-6 md:p-12 text-center">
+        <h2 class="text-3xl md:text-5xl font-bold">Find a Hostel Near KIU Ishaka<br><span class="text-green-700">In 2 Minutes.</span></h2>
+        <p class="mt-4 text-gray-600">No Brokers. Verified Photos. Direct to Landlord.</p>
 
-<main class="max-w-6xl mx-auto p-4">
-  <section class="grid grid-cols-3 gap-3 my-4" aria-label="Categories">
-    <a href="hostels.html?type=hostel" class="bg-white rounded-xl shadow p-4 text-center hover:ring-2 ring-green-600"><p class="font-bold">Hostels</p><p id="n-hostel" class="text-xs text-gray-500"></p></a>
-    <a href="hostels.html?type=room" class="bg-white rounded-xl shadow p-4 text-center hover:ring-2 ring-green-600"><p class="font-bold">Rooms</p><p id="n-room" class="text-xs text-gray-500"></p></a>
-    <a href="hostels.html?type=apartment" class="bg-white rounded-xl shadow p-4 text-center hover:ring-2 ring-green-600"><p class="font-bold">Apartments</p><p id="n-apartment" class="text-xs text-gray-500"></p></a>
-  </section>
+        <div class="mt-8 bg-gray-100 p-4 rounded-xl max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-2">
+            <select class="p-3 rounded-lg border"><option>All Areas</option><option>KIU Road</option><option>Kanyamiramu</option><option>Katunga</option><option>Town</option></select>
+            <select class="p-3 rounded-lg border"><option>Any Budget</option><option>300k-400k</option><option>400k-500k</option><option>500k+</option></select>
+            <select class="p-3 rounded-lg border"><option>Any Type</option><option>Single</option><option>Double</option><option>Self-contained</option></select>
+            <a href="hostels.html" class="bg-green-700 text-white p-3 rounded-lg font-bold text-center">SEARCH</a>
+        </div>
 
-  <section class="mt-6">
-    <h2 class="font-bold text-xl mb-3">Featured</h2>
-    <div id="featured" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-  </section>
+        <div class="mt-6 flex justify-center gap-4 text-xs">
+            <span>✅ 120+ Verified</span><span>✅ No Student Fee</span><span>✅ Free Viewing</span>
+        </div>
+    </section>
 
   <section class="mt-8">
     <div class="flex justify-between items-baseline mb-3">
