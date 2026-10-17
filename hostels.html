@@ -26,11 +26,14 @@
   <p id="count" class="text-sm text-gray-500 my-3"></p>
   <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
 <script src="listings.js"></script>
 <script>
+(async () => {
 const $ = id => document.getElementById(id);
 const p = new URLSearchParams(location.search);
-const live = LISTINGS.filter(l => l.status === 'approved');
+const live = await loadListings();
 $('area').innerHTML = '<option value="">All areas</option>' + [...new Set(live.map(l => l.area))].sort().map(a => `<option>${esc(a)}</option>`).join('');
 ['q','area','budget','walk','period','sort'].forEach(k => { if (p.get(k)) $(k).value = p.get(k); });
 const TYPES = [['','All'],['hostel','Hostels'],['room','Rooms'],['apartment','Apartments']];
@@ -66,6 +69,7 @@ function render() {
 }
 ['q','area','budget','walk','period','sort'].forEach(k => $(k).addEventListener('input', render));
 chips(); render();
+})();
 </script>
 </body>
 </html>

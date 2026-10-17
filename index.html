@@ -12,26 +12,35 @@
 <nav class="bg-white shadow">
   <div class="max-w-6xl mx-auto p-4 flex justify-between items-center">
     <a href="index.html" class="font-bold text-xl text-green-700">IshakaHostels<span class="text-gray-800">.com</span></a>
-    <a href="for-landlords.html" class="bg-green-700 text-white px-4 py-2 rounded-full text-sm">Post a listing</a>
+    <span class="flex items-center gap-4"><a href="login.html" class="text-sm text-gray-600">Log in</a><a href="post.html" class="bg-green-700 text-white px-4 py-2 rounded-full text-sm">Post a listing</a></span>
   </div>
 </nav>
 
-    <!-- HERO -->
-    <section class="bg-white p-6 md:p-12 text-center">
-        <h2 class="text-3xl md:text-5xl font-bold">Find a Hostel Near KIU Ishaka<br><span class="text-green-700">In 2 Minutes.</span></h2>
-        <p class="mt-4 text-gray-600">No Brokers. Verified Photos. Direct to Landlord.</p>
+<header class="bg-white border-b">
+  <div class="max-w-3xl mx-auto px-4 py-8 md:py-12">
+    <h1 class="text-3xl md:text-4xl font-bold">Find a place to stay in Ishaka</h1>
+    <p class="mt-2 text-gray-600">Hostels, rooms and apartments near KIU. Contact the landlord directly.</p>
+    <form action="hostels.html" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-2">
+      <input name="q" type="search" placeholder="Search name or facility" class="col-span-2 md:col-span-4 border rounded-lg p-3">
+      <select name="area" id="area" class="border rounded-lg p-3 bg-white"></select>
+      <select name="budget" class="border rounded-lg p-3 bg-white"><option value="0">Any budget</option><option value="100000">Up to 100k</option><option value="300000">Up to 300k</option><option value="400000">Up to 400k</option><option value="500000">Up to 500k</option></select>
+      <select name="walk" class="border rounded-lg p-3 bg-white"><option value="0">Any distance to KIU</option><option value="5">Within 5 min walk</option><option value="10">Within 10 min walk</option></select>
+      <button class="bg-green-700 text-white rounded-lg p-3 font-bold">Search</button>
+    </form>
+  </div>
+</header>
 
-        <div class="mt-8 bg-gray-100 p-4 rounded-xl max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-2">
-            <select class="p-3 rounded-lg border"><option>All Areas</option><option>KIU Road</option><option>Kanyamiramu</option><option>Katunga</option><option>Town</option></select>
-            <select class="p-3 rounded-lg border"><option>Any Budget</option><option>300k-400k</option><option>400k-500k</option><option>500k+</option></select>
-            <select class="p-3 rounded-lg border"><option>Any Type</option><option>Single</option><option>Double</option><option>Self-contained</option></select>
-            <a href="hostels.html" class="bg-green-700 text-white p-3 rounded-lg font-bold text-center">SEARCH</a>
-        </div>
+<main class="max-w-6xl mx-auto p-4">
+  <section class="grid grid-cols-3 gap-3 my-4" aria-label="Categories">
+    <a href="hostels.html?type=hostel" class="bg-white rounded-xl shadow p-4 text-center hover:ring-2 ring-green-600"><p class="font-bold">Hostels</p><p id="n-hostel" class="text-xs text-gray-500"></p></a>
+    <a href="hostels.html?type=room" class="bg-white rounded-xl shadow p-4 text-center hover:ring-2 ring-green-600"><p class="font-bold">Rooms</p><p id="n-room" class="text-xs text-gray-500"></p></a>
+    <a href="hostels.html?type=apartment" class="bg-white rounded-xl shadow p-4 text-center hover:ring-2 ring-green-600"><p class="font-bold">Apartments</p><p id="n-apartment" class="text-xs text-gray-500"></p></a>
+  </section>
 
-        <div class="mt-6 flex justify-center gap-4 text-xs">
-            <span>✅ 120+ Verified</span><span>✅ No Student Fee</span><span>✅ Free Viewing</span>
-        </div>
-    </section>
+  <section class="mt-6">
+    <h2 class="font-bold text-xl mb-3">Featured</h2>
+    <div id="featured" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </section>
 
   <section class="mt-8">
     <div class="flex justify-between items-baseline mb-3">
@@ -44,15 +53,18 @@
   <section class="mt-10 bg-green-700 text-white rounded-xl p-6 md:p-8 text-center">
     <h2 class="text-xl font-bold">Have rooms to fill?</h2>
     <p class="mt-2 text-green-50 text-sm">Post your hostel for free. You pay 50k only when a student moves in.</p>
-    <a href="for-landlords.html" class="inline-block mt-4 bg-white text-green-700 font-bold px-6 py-3 rounded-full">Post a listing</a>
+    <a href="post.html" class="inline-block mt-4 bg-white text-green-700 font-bold px-6 py-3 rounded-full">Post a listing</a>
   </section>
 </main>
 
 <footer class="bg-gray-900 text-white text-center p-6 mt-10 text-sm">Built by Jarols Tech | KIU Western Campus | 2026</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
 <script src="listings.js"></script>
 <script>
-const live = LISTINGS.filter(l => l.status === 'approved');
+(async () => {
+const live = await loadListings();
 document.getElementById('area').innerHTML = '<option value="">All areas</option>' + [...new Set(live.map(l => l.area))].sort().map(a => `<option>${esc(a)}</option>`).join('');
 ['hostel','room','apartment'].forEach(t => {
   const n = live.filter(l => l.type === t).length;
@@ -76,6 +88,7 @@ const feat = live.filter(l => l.featured).slice(0, 3);
 document.getElementById('featured').innerHTML = feat.length ? feat.map(card).join('') : empty;
 const newest = [...live].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 6);
 document.getElementById('newest').innerHTML = newest.length ? newest.map(card).join('') : empty;
+})();
 </script>
 </body>
 </html>
