@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Listing details | Ishaka Hostels</title>
+<link rel="icon" type="image/svg+xml" href="logo-icon.svg">
+<title>Listing details | Campus Hostels</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-white text-gray-900">
@@ -18,10 +19,10 @@ const id = new URLSearchParams(location.search).get('id');
 const l = await loadListing(id);
 const app = document.getElementById('app');
 if (!l) {
-  document.title = 'Listing not found | Ishaka Hostels';
+  document.title = 'Listing not found | Campus Hostels';
   app.innerHTML = '<div class="text-center py-16"><p class="font-semibold">This listing is not available.</p><p class="text-sm text-gray-500 mt-1">It may have been rented out or removed.</p><a href="hostels.html" class="inline-block mt-3 text-green-700 font-semibold">Browse all listings</a></div>';
 } else {
-  document.title = `${l.title}, ${l.area} | Ishaka Hostels`;
+  document.title = `${l.title}, ${l.area} | Campus Hostels`;
   const fact = (k, v) => `<div><p class="text-xs text-gray-500">${k}</p><p class="font-bold">${esc(v)}</p></div>`;
   app.innerHTML = `
     <img src="${esc(l.image)}" alt="${esc(l.title)}" class="rounded-xl w-full h-72 md:h-96 object-cover">

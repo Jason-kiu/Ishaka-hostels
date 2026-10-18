@@ -3,7 +3,7 @@
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money = l => `UGX ${l.price/1000}k per ${l.period}`;
 const waLink = (l, code, name) => `https://wa.me/${l.phone}?text=` + encodeURIComponent(
-  `Hi, ${name ? "I'm " + name + '. ' : ''}I saw ${l.title} on Ishaka Hostels (${location.origin}/hostel-details.html?id=${l.id}).${code ? ' My reference is ' + code + '.' : ''} Is it still available?`);
+  `Hi, ${name ? "I'm " + name + '. ' : ''}I saw ${l.title} on Campus Hostels (${location.origin}/hostel-details.html?id=${l.id}).${code ? ' My reference is ' + code + '.' : ''} Is it still available?`);
 // Campuses students can choose from. Edit this one list to add or rename campuses everywhere on the site.
 const CAMPUSES = ['KIU Ishaka', 'MUST Mbarara', 'Makerere Kampala', 'Kyambogo Kampala'];
 const CACHE = {};

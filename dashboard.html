@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script><title>My listings | Ishaka Hostels</title></head>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script><link rel="icon" type="image/svg+xml" href="logo-icon.svg">
+<title>My listings | Campus Hostels</title></head>
 <body class="bg-gray-50 text-gray-900">
 <nav class="bg-white shadow p-4 flex justify-between items-center">
-  <a href="index.html" class="font-bold text-green-700">IshakaHostels</a>
+  <a href="index.html" class="shrink-0" aria-label="Campus Hostels home"><img src="logo.svg" alt="Campus Hostels" class="h-8 sm:h-10 w-auto"></a>
   <span class="text-sm"><a id="adm" hidden href="admin.html" class="text-green-700 font-semibold mr-4">Admin</a><a href="login.html" class="text-gray-500">Account</a></span>
 </nav>
 <main class="max-w-3xl mx-auto p-4">
@@ -14,7 +15,7 @@
   <div id="list" class="space-y-3"><p class="text-sm text-gray-500">Loading...</p></div>
   <section class="mt-8">
     <h2 class="text-xl font-bold">Student leads</h2>
-    <p class="text-sm text-gray-500 mt-1 mb-3">Students who contacted you through the site. When a student moves in, enter their reference code. A commission is due to Ishaka Hostels for each move-in.</p>
+    <p class="text-sm text-gray-500 mt-1 mb-3">Students who contacted you through the site. When a student moves in, enter their reference code. A commission is due to Campus Hostels for each move-in.</p>
     <form id="mi" class="flex gap-2"><input id="code" required placeholder="Reference code e.g. 7F3A9C" class="flex-1 border p-3 rounded uppercase"><button class="bg-green-700 text-white px-4 rounded">Mark moved in</button></form>
     <p id="mimsg" class="text-sm mt-2" role="status"></p>
     <div id="leads" class="space-y-2 mt-3"></div>
