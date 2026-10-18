@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hostels and rentals in Ishaka | Ishaka Hostels</title>
+<title>Hostels and rentals near campus | Ishaka Hostels</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -16,12 +16,13 @@
   <div id="types" class="max-w-6xl mx-auto px-3 pb-3 flex gap-2 overflow-x-auto text-sm"></div>
 </nav>
 <main class="max-w-6xl mx-auto p-3">
-  <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm">
+  <div class="grid grid-cols-2 md:grid-cols-6 gap-2 text-sm">
+    <select id="campus" class="border rounded p-2 bg-white"></select>
     <select id="area" class="border rounded p-2 bg-white"></select>
     <select id="budget" class="border rounded p-2 bg-white"><option value="0">Any budget</option><option value="100000">Up to 100k</option><option value="300000">Up to 300k</option><option value="400000">Up to 400k</option><option value="500000">Up to 500k</option></select>
-    <select id="walk" class="border rounded p-2 bg-white"><option value="0">Any distance to KIU</option><option value="5">Within 5 min walk</option><option value="10">Within 10 min walk</option><option value="20">Within 20 min walk</option></select>
+    <select id="walk" class="border rounded p-2 bg-white"><option value="0">Any distance to campus</option><option value="5">Within 5 min walk</option><option value="10">Within 10 min walk</option><option value="20">Within 20 min walk</option></select>
     <select id="period" class="border rounded p-2 bg-white"><option value="">Pay per semester or month</option><option value="semester">Per semester</option><option value="month">Per month</option></select>
-    <select id="sort" class="border rounded p-2 bg-white col-span-2 md:col-span-1"><option value="new">Newest first</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="near">Nearest to KIU</option></select>
+    <select id="sort" class="border rounded p-2 bg-white col-span-2 md:col-span-1"><option value="new">Newest first</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="near">Nearest to campus</option></select>
   </div>
   <p id="count" class="text-sm text-gray-500 my-3"></p>
   <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -34,7 +35,15 @@
 const $ = id => document.getElementById(id);
 const p = new URLSearchParams(location.search);
 const live = await loadListings();
-$('area').innerHTML = '<option value="">All areas</option>' + [...new Set(live.map(l => l.area))].sort().map(a => `<option>${esc(a)}</option>`).join('');
+const camps = [...new Set([...CAMPUSES, ...live.map(l => l.campus)])];
+$('campus').innerHTML = '<option value="">All campuses</option>' + camps.map(c => `<option>${esc(c)}</option>`).join('');
+function fillAreas() {
+  const cur = $('area').value, c = $('campus').value;
+  $('area').innerHTML = '<option value="">All areas</option>' + [...new Set(live.filter(l => !c || l.campus === c).map(l => l.area))].sort().map(a => `<option>${esc(a)}</option>`).join('');
+  $('area').value = cur;
+}
+if (p.get('campus')) $('campus').value = p.get('campus');
+fillAreas();
 ['q','area','budget','walk','period','sort'].forEach(k => { if (p.get(k)) $(k).value = p.get(k); });
 const TYPES = [['','All'],['hostel','Hostels'],['room','Rooms'],['apartment','Apartments']];
 let type = p.get('type') || '';
@@ -48,7 +57,7 @@ function card(l) {
     <div class="p-4 flex-1 flex flex-col">
       <p class="font-bold text-green-700">${money(l)}</p>
       <h2 class="font-semibold mt-1">${esc(l.title)} ${l.sample ? '<span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Sample</span>' : ''}</h2>
-      <p class="text-xs text-gray-500">${esc(l.area)}, ${l.walkMins} min walk to KIU. ${esc(l.roomKind)}</p>
+      <p class="text-xs text-gray-500">${esc(l.area)}, ${l.walkMins} min walk to ${esc(l.campus)}. ${esc(l.roomKind)}</p>
       <p class="text-xs text-gray-500 mt-1">${l.amenities.slice(0,3).map(esc).join(', ')}</p>
       <div class="mt-auto pt-3 flex gap-2">
         <a href="hostel-details.html?id=${esc(l.id)}" class="flex-1 border text-center py-2 rounded text-sm">Details</a>
@@ -57,17 +66,18 @@ function card(l) {
     </div></article>`;
 }
 function render() {
-  const q = $('q').value.trim().toLowerCase(), area = $('area').value, budget = +$('budget').value, walk = +$('walk').value, period = $('period').value, sort = $('sort').value;
+  const q = $('q').value.trim().toLowerCase(), campus = $('campus').value, area = $('area').value, budget = +$('budget').value, walk = +$('walk').value, period = $('period').value, sort = $('sort').value;
   const r = live.filter(l =>
-    (!type || l.type === type) && (!area || l.area === area) && (!budget || l.price <= budget) &&
+    (!type || l.type === type) && (!campus || l.campus === campus) && (!area || l.area === area) && (!budget || l.price <= budget) &&
     (!walk || l.walkMins <= walk) && (!period || l.period === period) &&
     (!q || [l.title, l.area, l.roomKind, ...l.amenities].join(' ').toLowerCase().includes(q)));
   r.sort((a, b) => sort === 'low' ? a.price - b.price : sort === 'high' ? b.price - a.price : sort === 'near' ? a.walkMins - b.walkMins : b.createdAt.localeCompare(a.createdAt));
-  $('count').textContent = `${r.length} ${r.length === 1 ? 'listing' : 'listings'} in Ishaka`;
+  $('count').textContent = `${r.length} ${r.length === 1 ? 'listing' : 'listings'}`;
   $('grid').innerHTML = r.length ? r.map(card).join('') :
     '<div class="col-span-full bg-white rounded-xl p-8 text-center"><p class="font-semibold">No listings match these filters.</p><p class="text-sm text-gray-500 mt-1">Try a higher budget or a wider distance.</p><a href="hostels.html" class="inline-block mt-3 text-green-700 font-semibold">Clear filters</a></div>';
 }
-['q','area','budget','walk','period','sort'].forEach(k => $(k).addEventListener('input', render));
+$('campus').addEventListener('input', () => { $('area').value = ''; fillAreas(); });
+['q','campus','area','budget','walk','period','sort'].forEach(k => $(k).addEventListener('input', render));
 chips(); render();
 })();
 </script>

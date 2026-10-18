@@ -26,7 +26,7 @@ if (!l) {
   app.innerHTML = `
     <img src="${esc(l.image)}" alt="${esc(l.title)}" class="rounded-xl w-full h-72 md:h-96 object-cover">
     <h1 class="text-2xl font-bold mt-4">${esc(l.title)}, ${esc(l.area)} ${l.sample ? '<span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded align-middle">Sample</span>' : ''}</h1>
-    <p class="text-gray-500">${l.walkMins} min walk to KIU${l.note ? '. ' + esc(l.note) : ''}</p>
+    <p class="text-gray-500">${l.walkMins} min walk to ${esc(l.campus)}${l.note ? '. ' + esc(l.note) : ''}</p>
     <div class="mt-4 grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl">
       ${fact('Price', money(l).replace('UGX ', ''))}
       ${fact('Deposit', l.deposit ? `${l.deposit/1000}k` : 'None')}

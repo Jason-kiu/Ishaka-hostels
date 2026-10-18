@@ -32,7 +32,7 @@ async function load() {
       <img src="${esc(l.image_url)}" alt="" class="w-28 h-28 object-cover rounded-lg shrink-0">
       <div class="min-w-0 text-sm">
         <h2 class="font-semibold">${esc(l.title)} ${l.featured ? '<span class="text-xs bg-green-100 text-green-800 px-2 rounded">Featured</span>' : ''}</h2>
-        <p class="text-gray-500">${esc(l.type)}, ${esc(l.area)}, ${l.walk_mins} min walk. UGX ${l.price/1000}k per ${esc(l.period)}, deposit ${l.deposit/1000}k</p>
+        <p class="text-gray-500">${esc(l.type)}, ${esc(l.campus)}, ${esc(l.area)}, ${l.walk_mins} min walk. UGX ${l.price/1000}k per ${esc(l.period)}, deposit ${l.deposit/1000}k</p>
         <p class="text-gray-500">${esc(l.room_kind)}. ${l.amenities.map(esc).join(', ')}</p>
         <p class="text-gray-500">${esc(l.landlord_name)}, <a class="text-green-700" href="https://wa.me/${esc(l.phone)}" target="_blank" rel="noopener">${esc(l.phone)}</a></p>
         ${l.note ? '<p class="text-gray-500">' + esc(l.note) + '</p>' : ''}
