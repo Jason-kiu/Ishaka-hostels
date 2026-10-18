@@ -7,9 +7,9 @@
   <div id="list" class="space-y-3"><p class="text-sm text-gray-500">Loading...</p></div>
 </main>
 <script src="config.js"></script>
+<script src="listings.js"></script>
 <script>
 const $ = id => document.getElementById(id);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TAB = 'pending', ROWS = [];
 function tabs() {
   $('tabs').innerHTML = [['pending','Pending'],['approved','Live'],['rejected','Rejected'],['rented','Rented out'],['leads','Leads and income']].map(([v, n]) =>
@@ -41,6 +41,7 @@ async function load() {
       ${l.status !== 'approved' ? `<button data-a="approve" data-id="${l.id}" class="bg-green-700 text-white px-4 py-1.5 rounded">Approve</button>` : ''}
       ${l.status !== 'rejected' ? `<button data-a="reject" data-id="${l.id}" class="border px-4 py-1.5 rounded">Reject</button>` : ''}
       ${l.status === 'approved' ? `<button data-a="feature" data-id="${l.id}" class="border px-4 py-1.5 rounded">${l.featured ? 'Remove featured' : 'Make featured'}</button>` : ''}
+      <button data-a="campus" data-id="${l.id}" class="border px-4 py-1.5 rounded">Campus: ${esc(l.campus)}</button>
       ${l.status === 'approved' || l.status === 'rented' ? `<button data-a="units" data-id="${l.id}" class="border px-4 py-1.5 rounded">Rooms: ${l.units_available}</button>` : ''}
       <button data-a="delete" data-id="${l.id}" class="text-red-600 px-2">Delete</button>
     </div></article>`).join('') : '<p class="text-sm text-gray-500">Nothing here.</p>';
@@ -53,6 +54,7 @@ $('list').onclick = async e => {
   if (a === 'approve') q = db.from('listings').update({ status: 'approved', reject_reason: null, units_available: l.units_available || 1 }).eq('id', id);
   else if (a === 'reject') { const r = prompt('Reason for rejecting (the landlord will see this):'); if (r === null) return; q = db.from('listings').update({ status: 'rejected', reject_reason: r.trim() || null }).eq('id', id); }
   else if (a === 'units') { const v = prompt('Rooms available:', l.units_available); if (v === null) return; const n = Math.max(0, parseInt(v, 10) || 0); const u = { units_available: n }; if (n === 0 && l.status === 'approved') u.status = 'rented'; else if (n > 0 && l.status === 'rented') u.status = 'approved'; q = db.from('listings').update(u).eq('id', id); }
+  else if (a === 'campus') { const v = prompt('Campus for this listing:\n' + CAMPUSES.map((c, i) => (i + 1) + '. ' + c).join('\n') + '\nType the number, or a new campus name:', l.campus); if (v === null) return; const t = v.trim(); const c = CAMPUSES[parseInt(t, 10) - 1] || t; if (!c) return; q = db.from('listings').update({ campus: c }).eq('id', id); }
   else if (a === 'feature') q = db.from('listings').update({ featured: !l.featured }).eq('id', id);
   else if (a === 'delete') { if (!confirm('Delete permanently?')) return; q = db.from('listings').delete().eq('id', id); }
   const { error } = await q; if (error) alert(error.message); else load();

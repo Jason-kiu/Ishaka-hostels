@@ -36,7 +36,8 @@
 <script src="listings.js"></script>
 <script>
 const $ = id => document.getElementById(id);
-document.getElementById('campus').innerHTML = CAMPUSES.map(c => `<option>${esc(c)}</option>`).join('');
+document.getElementById('campus').innerHTML = '<option value="">Select a campus</option>' + CAMPUSES.map(c => `<option>${esc(c)}</option>`).join('');
+document.getElementById('campus').addEventListener('change', e => { document.getElementById('walk').placeholder = e.target.value ? 'Walk to ' + e.target.value + ' (minutes)' : 'Walk to campus (minutes)'; });
 const editId = new URLSearchParams(location.search).get('id');
 let UID, imageUrl = null;
 const msg = (t, bad) => { $('msg').textContent = t; $('msg').className = 'text-sm ' + (bad ? 'text-red-600' : 'text-gray-700'); };
