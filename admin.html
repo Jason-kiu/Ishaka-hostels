@@ -12,7 +12,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TAB = 'pending', ROWS = [];
 function tabs() {
-  $('tabs').innerHTML = [['pending','Pending'],['approved','Live'],['rejected','Rejected'],['leads','Leads and income']].map(([v, n]) =>
+  $('tabs').innerHTML = [['pending','Pending'],['approved','Live'],['rejected','Rejected'],['rented','Rented out'],['leads','Leads and income']].map(([v, n]) =>
     `<button data-t="${v}" class="px-4 py-1.5 rounded-full border ${v === TAB ? 'bg-green-700 text-white border-green-700' : 'bg-white'}">${n}</button>`).join('');
 }
 (async () => {
@@ -41,6 +41,7 @@ async function load() {
       ${l.status !== 'approved' ? `<button data-a="approve" data-id="${l.id}" class="bg-green-700 text-white px-4 py-1.5 rounded">Approve</button>` : ''}
       ${l.status !== 'rejected' ? `<button data-a="reject" data-id="${l.id}" class="border px-4 py-1.5 rounded">Reject</button>` : ''}
       ${l.status === 'approved' ? `<button data-a="feature" data-id="${l.id}" class="border px-4 py-1.5 rounded">${l.featured ? 'Remove featured' : 'Make featured'}</button>` : ''}
+      ${l.status === 'approved' || l.status === 'rented' ? `<button data-a="units" data-id="${l.id}" class="border px-4 py-1.5 rounded">Rooms: ${l.units_available}</button>` : ''}
       <button data-a="delete" data-id="${l.id}" class="text-red-600 px-2">Delete</button>
     </div></article>`).join('') : '<p class="text-sm text-gray-500">Nothing here.</p>';
 }
@@ -49,8 +50,9 @@ $('list').onclick = async e => {
   const { a, id } = e.target.dataset; if (!a) return;
   if (TAB === 'leads') return leadAction(a, id);
   const l = ROWS.find(x => x.id === id); let q;
-  if (a === 'approve') q = db.from('listings').update({ status: 'approved', reject_reason: null }).eq('id', id);
+  if (a === 'approve') q = db.from('listings').update({ status: 'approved', reject_reason: null, units_available: l.units_available || 1 }).eq('id', id);
   else if (a === 'reject') { const r = prompt('Reason for rejecting (the landlord will see this):'); if (r === null) return; q = db.from('listings').update({ status: 'rejected', reject_reason: r.trim() || null }).eq('id', id); }
+  else if (a === 'units') { const v = prompt('Rooms available:', l.units_available); if (v === null) return; const n = Math.max(0, parseInt(v, 10) || 0); const u = { units_available: n }; if (n === 0 && l.status === 'approved') u.status = 'rented'; else if (n > 0 && l.status === 'rented') u.status = 'approved'; q = db.from('listings').update(u).eq('id', id); }
   else if (a === 'feature') q = db.from('listings').update({ featured: !l.featured }).eq('id', id);
   else if (a === 'delete') { if (!confirm('Delete permanently?')) return; q = db.from('listings').delete().eq('id', id); }
   const { error } = await q; if (error) alert(error.message); else load();

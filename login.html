@@ -14,18 +14,8 @@
     <p class="text-sm text-gray-500">Signed in as</p>
     <p id="who" class="font-bold break-all"></p>
     <p class="text-sm text-gray-500 mt-1">Account type: <span id="role" class="font-semibold"></span></p>
-    <a id="adminlink" hidden href="admin.html" class="block mt-4 bg-gray-900 text-white py-3 rounded-xl font-bold">Approve listings <span id="pend"></span></a>
-    <a href="dashboard.html" class="block mt-3 bg-green-700 text-white py-3 rounded-xl font-bold">Go to my dashboard</a>
+    <a href="dashboard.html" class="block mt-4 bg-green-700 text-white py-3 rounded-xl font-bold">Go to my dashboard</a>
     <button id="logout" class="mt-3 text-sm text-gray-500 underline">Log out</button>
-  </div>
-
-  <div id="rec" hidden class="bg-white rounded-xl shadow p-6">
-    <h1 class="font-bold">Choose a new password</h1>
-    <form id="rform" class="space-y-3 mt-3">
-      <input id="npw" type="password" required minlength="8" autocomplete="new-password" placeholder="New password (8+ characters)" class="w-full border p-3 rounded">
-      <button class="w-full bg-green-700 text-white p-3 rounded-xl font-bold">Save new password</button>
-    </form>
-    <p id="rmsg" class="text-sm mt-3 text-red-600" role="status"></p>
   </div>
 
   <div id="in" class="bg-white rounded-xl shadow p-6">
@@ -39,7 +29,6 @@
       <button id="go" class="w-full bg-green-700 text-white p-3 rounded-xl font-bold"></button>
     </form>
     <p id="msg" class="text-sm mt-3" role="status"></p>
-    <button id="forgot" type="button" class="text-sm text-green-700 mt-2">Forgot password?</button>
     <p class="text-xs text-gray-500 mt-4">Landlords: create an account to post and manage your listings. Students don't need an account.</p>
   </div>
 </main>
@@ -55,22 +44,15 @@ function setMode(m) {
   $('t-signup').className = 'flex-1 py-2 rounded-full border ' + (m === 'signup' ? 'bg-green-700 text-white border-green-700' : 'bg-white');
   $('go').textContent = m === 'login' ? 'Log in' : 'Create account';
   $('pw').autocomplete = m === 'login' ? 'current-password' : 'new-password';
-  $('forgot').hidden = m !== 'login';
   msg('');
 }
 async function show() {
-  if (!$('rec').hidden) return;
   const { data: { session } } = await db.auth.getSession();
   $('in').hidden = !!session; $('out').hidden = !session;
   if (session) {
     $('who').textContent = session.user.email;
     const { data } = await db.from('profiles').select('role').eq('id', session.user.id).single();
     $('role').textContent = data ? data.role : 'landlord';
-    if (data && data.role === 'admin') {
-      $('adminlink').hidden = false;
-      const { count } = await db.from('listings').select('id', { count: 'exact', head: true }).eq('status', 'pending');
-      $('pend').textContent = count ? '(' + count + ' waiting)' : '';
-    }
   }
 }
 $('t-login').onclick = () => setMode('login');
@@ -80,23 +62,10 @@ $('form').onsubmit = async e => {
   if (SUPABASE_ANON_KEY.includes('PASTE')) return msg('The Supabase key is missing in config.js.', true);
   const email = $('email').value.trim(), password = $('pw').value;
   msg('Please wait...');
-  const res = mode === 'login' ? await db.auth.signInWithPassword({ email, password }) : await db.auth.signUp({ email, password, options: { emailRedirectTo: location.origin + '/login.html' } });
+  const res = mode === 'login' ? await db.auth.signInWithPassword({ email, password }) : await db.auth.signUp({ email, password });
   if (res.error) return msg(res.error.message, true);
   if (mode === 'signup' && !res.data.session) return msg('Account created. Check your email for a confirmation link, then log in.');
   msg(''); show();
-};
-db.auth.onAuthStateChange(ev => { if (ev === 'PASSWORD_RECOVERY') { $('in').hidden = true; $('out').hidden = true; $('rec').hidden = false; } });
-$('forgot').onclick = async () => {
-  const email = $('email').value.trim();
-  if (!email) return msg('Type your email above first.', true);
-  const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/login.html' });
-  msg(error ? error.message : 'If that email has an account, a reset link is on its way.', !!error);
-};
-$('rform').onsubmit = async e => {
-  e.preventDefault();
-  const { error } = await db.auth.updateUser({ password: $('npw').value });
-  if (error) { $('rmsg').textContent = error.message; return; }
-  $('rec').hidden = true; show();
 };
 $('logout').onclick = async () => { await db.auth.signOut(); show(); };
 setMode('login'); show();

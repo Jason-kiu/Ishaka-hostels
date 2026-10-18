@@ -7,7 +7,7 @@ const waLink = (l, code, name) => `https://wa.me/${l.phone}?text=` + encodeURICo
 // Campuses students can choose from. Edit this one list to add or rename campuses everywhere on the site.
 const CAMPUSES = ['KIU Ishaka', 'MUST Mbarara', 'Makerere Kampala', 'Kyambogo Kampala'];
 const CACHE = {};
-const mapListing = r => (CACHE[r.id] = { id:r.id, title:r.title, type:r.type, campus:r.campus, area:r.area, price:r.price, period:r.period, deposit:r.deposit, walkMins:r.walk_mins,
+const mapListing = r => (CACHE[r.id] = { id:r.id, title:r.title, type:r.type, campus:r.campus, units:r.units_available, area:r.area, price:r.price, period:r.period, deposit:r.deposit, walkMins:r.walk_mins,
   roomKind:r.room_kind, amenities:r.amenities || [], image:r.image_url, phone:r.phone, landlord:r.landlord_name, note:r.note,
   status:r.status, featured:r.featured, createdAt:r.created_at, reviews:[] });
 async function loadListings() {

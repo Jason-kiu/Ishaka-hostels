@@ -18,6 +18,7 @@
       <input id="deposit" type="number" min="0" placeholder="Deposit in UGX (0 if none)" class="border p-3 rounded">
       <input id="walk" type="number" min="0" required placeholder="Walk to campus (minutes)" class="border p-3 rounded">
     </div>
+    <label class="block text-gray-600">Rooms available<input id="units" type="number" min="1" required value="1" class="w-full border p-3 rounded mt-1 text-gray-900"></label>
     <input id="kind" placeholder="Room type e.g. Single, self-contained" class="w-full border p-3 rounded">
     <input id="amen" placeholder="Facilities, separated by commas: Tiled, Water inside, Security" class="w-full border p-3 rounded">
     <textarea id="note" placeholder="Directions or extra details" class="w-full border p-3 rounded"></textarea>
@@ -55,7 +56,7 @@ async function shrink(file) {
   const { data: l } = await db.from('listings').select('*').eq('id', editId).eq('owner_id', UID).single();
   if (!l) { msg('Listing not found.', true); return; }
   imageUrl = l.image_url;
-  Object.entries({ title:l.title, type:l.type, campus:l.campus, area:l.area, price:l.price, period:l.period, deposit:l.deposit, walk:l.walk_mins, kind:l.room_kind, amen:l.amenities.join(', '), note:l.note, lname:l.landlord_name, phone:l.phone }).forEach(([k, v]) => $(k).value = v);
+  Object.entries({ title:l.title, type:l.type, campus:l.campus, units:l.units_available, area:l.area, price:l.price, period:l.period, deposit:l.deposit, walk:l.walk_mins, kind:l.room_kind, amen:l.amenities.join(', '), note:l.note, lname:l.landlord_name, phone:l.phone }).forEach(([k, v]) => $(k).value = v);
   $('prev').src = imageUrl; $('prev').classList.remove('hidden');
   msg('Saving changes sends this listing for approval again.');
 })();
@@ -71,7 +72,7 @@ $('f').onsubmit = async e => {
       imageUrl = db.storage.from('listing-images').getPublicUrl(path).data.publicUrl;
     }
     if (!imageUrl) throw new Error('Please add a photo.');
-    const row = { title:$('title').value.trim(), type:$('type').value, campus:$('campus').value, area:$('area').value.trim(), price:+$('price').value, period:$('period').value,
+    const row = { title:$('title').value.trim(), type:$('type').value, campus:$('campus').value, units_available:Math.max(1, +$('units').value || 1), area:$('area').value.trim(), price:+$('price').value, period:$('period').value,
       deposit:+$('deposit').value || 0, walk_mins:+$('walk').value, room_kind:$('kind').value.trim(), note:$('note').value.trim(),
       amenities:$('amen').value.split(',').map(s => s.trim()).filter(Boolean), image_url:imageUrl, phone:phone($('phone').value), landlord_name:$('lname').value.trim() };
     const { error } = editId ? await db.from('listings').update(row).eq('id', editId) : await db.from('listings').insert(row);

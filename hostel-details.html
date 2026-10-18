@@ -32,6 +32,7 @@ if (!l) {
       ${fact('Deposit', l.deposit ? `${l.deposit/1000}k` : 'None')}
       ${fact('Room', l.roomKind)}
       ${fact('Posted by', l.landlord)}
+      ${l.units > 1 ? fact('Rooms available', l.units) : ''}
     </div>
     <h2 class="font-bold mt-6">Facilities</h2>
     <p class="mt-2 flex flex-wrap gap-2">${l.amenities.map(a => `<span class="text-sm bg-green-50 text-green-800 px-3 py-1 rounded-full">${esc(a)}</span>`).join('')}</p>
