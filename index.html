@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hostels and rentals in Ishaka, near KIU | Ishaka Hostels</title>
-<meta name="description" content="Find hostels, rooms and apartments in Ishaka near KIU Western Campus. Contact landlords directly on WhatsApp.">
+<title>Hostels and rentals near your campus | Ishaka Hostels</title>
+<meta name="description" content="Find hostels, rooms and apartments near university campuses. Contact landlords directly on WhatsApp.">
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-900">
-<div class="bg-green-700 text-white text-xs p-2 text-center">KIU Western Campus, Ishaka. Questions? WhatsApp 0767037951</div>
+<div class="bg-green-700 text-white text-xs p-2 text-center">Hostels and rentals near campuses. Questions? WhatsApp 0767037951</div>
 <nav class="bg-white shadow">
   <div class="max-w-6xl mx-auto p-4 flex justify-between items-center">
     <a href="index.html" class="font-bold text-xl text-green-700">IshakaHostels<span class="text-gray-800">.com</span></a>
@@ -18,19 +18,20 @@
 
 <header class="bg-white border-b">
   <div class="max-w-3xl mx-auto px-4 py-8 md:py-12">
-    <h1 class="text-3xl md:text-4xl font-bold">Find a place to stay in Ishaka</h1>
-    <p class="mt-2 text-gray-600">Hostels, rooms and apartments near KIU. Contact the landlord directly.</p>
+    <h1 class="text-3xl md:text-4xl font-bold">Find a place to stay near your campus</h1>
+    <p class="mt-2 text-gray-600">Hostels, rooms and apartments near university campuses. Contact the landlord directly.</p>
     <form action="hostels.html" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-2">
       <input name="q" type="search" placeholder="Search name or facility" class="col-span-2 md:col-span-4 border rounded-lg p-3">
-      <select name="area" id="area" class="border rounded-lg p-3 bg-white"></select>
+      <select name="campus" id="campus" class="border rounded-lg p-3 bg-white"></select>
       <select name="budget" class="border rounded-lg p-3 bg-white"><option value="0">Any budget</option><option value="100000">Up to 100k</option><option value="300000">Up to 300k</option><option value="400000">Up to 400k</option><option value="500000">Up to 500k</option></select>
-      <select name="walk" class="border rounded-lg p-3 bg-white"><option value="0">Any distance to KIU</option><option value="5">Within 5 min walk</option><option value="10">Within 10 min walk</option></select>
+      <select name="walk" class="border rounded-lg p-3 bg-white"><option value="0">Any distance to campus</option><option value="5">Within 5 min walk</option><option value="10">Within 10 min walk</option></select>
       <button class="bg-green-700 text-white rounded-lg p-3 font-bold">Search</button>
     </form>
   </div>
 </header>
 
 <main class="max-w-6xl mx-auto p-4">
+  <section class="mt-4"><h2 class="font-bold text-lg mb-2">Browse by campus</h2><div id="campuses" class="flex gap-2 overflow-x-auto text-sm pb-1"></div></section>
   <section class="grid grid-cols-3 gap-3 my-4" aria-label="Categories">
     <a href="hostels.html?type=hostel" class="bg-white rounded-xl shadow p-4 text-center hover:ring-2 ring-green-600"><p class="font-bold">Hostels</p><p id="n-hostel" class="text-xs text-gray-500"></p></a>
     <a href="hostels.html?type=room" class="bg-white rounded-xl shadow p-4 text-center hover:ring-2 ring-green-600"><p class="font-bold">Rooms</p><p id="n-room" class="text-xs text-gray-500"></p></a>
@@ -57,7 +58,7 @@
   </section>
 </main>
 
-<footer class="bg-gray-900 text-white text-center p-6 mt-10 text-sm">Built by Jarols Tech | KIU Western Campus | 2026</footer>
+<footer class="bg-gray-900 text-white text-center p-6 mt-10 text-sm">Built by Jarols Tech | 2026</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
@@ -65,7 +66,9 @@
 <script>
 (async () => {
 const live = await loadListings();
-document.getElementById('area').innerHTML = '<option value="">All areas</option>' + [...new Set(live.map(l => l.area))].sort().map(a => `<option>${esc(a)}</option>`).join('');
+const camps = [...new Set([...CAMPUSES, ...live.map(l => l.campus)])];
+document.getElementById('campus').innerHTML = '<option value="">All campuses</option>' + camps.map(c => `<option>${esc(c)}</option>`).join('');
+document.getElementById('campuses').innerHTML = camps.map(c => `<a href="hostels.html?campus=${encodeURIComponent(c)}" class="px-4 py-1.5 rounded-full border bg-white whitespace-nowrap">${esc(c)} <span class="text-gray-400">${live.filter(l => l.campus === c).length}</span></a>`).join('');
 ['hostel','room','apartment'].forEach(t => {
   const n = live.filter(l => l.type === t).length;
   document.getElementById('n-' + t).textContent = `${n} ${n === 1 ? 'listing' : 'listings'}`;
@@ -76,10 +79,10 @@ function card(l) {
     <div class="p-4 flex-1 flex flex-col">
       <p class="font-bold text-green-700">${money(l)}</p>
       <h3 class="font-semibold mt-1">${esc(l.title)} ${l.sample ? '<span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Sample</span>' : ''}</h3>
-      <p class="text-xs text-gray-500">${esc(l.area)}, ${l.walkMins} min walk to KIU. ${esc(l.roomKind)}</p>
+      <p class="text-xs text-gray-500">${esc(l.area)}, ${l.walkMins} min walk to ${esc(l.campus)}. ${esc(l.roomKind)}</p>
       <div class="mt-auto pt-3 flex gap-2">
         <a href="hostel-details.html?id=${esc(l.id)}" class="flex-1 border text-center py-2 rounded text-sm">Details</a>
-        <a href="${waLink(l)}" target="_blank" rel="noopener" class="flex-1 bg-green-600 text-white text-center py-2 rounded text-sm">WhatsApp</a>
+        <button data-lead="${esc(l.id)}" class="flex-1 bg-green-600 text-white text-center py-2 rounded text-sm">WhatsApp</button>
       </div>
     </div></article>`;
 }
